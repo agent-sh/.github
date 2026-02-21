@@ -13,8 +13,8 @@
 
 | Repo | What it does |
 |------|-------------|
-| [**agentsys**](https://github.com/agent-sh/agentsys) | Agent orchestration runtime — 14 plugins, 43 agents, 30 skills. Works with Claude Code, OpenCode, Codex. |
-| [**agnix**](https://github.com/agent-sh/agnix) | Lint agent configs before they break. 230 rules for CLAUDE.md, AGENTS.md, skills, hooks, MCP. |
+| [**agentsys**](https://github.com/agent-sh/agentsys) | Agent orchestration runtime across plugins, agents, and skills. Works with Claude Code, OpenCode, Codex. |
+| [**agnix**](https://github.com/agent-sh/agnix) | Lint agent configs before they break with comprehensive rules for CLAUDE.md, AGENTS.md, skills, hooks, and MCP. |
 | [**web-ctl**](https://github.com/agent-sh/web-ctl) | Browser interaction skill for AI agents — Playwright-based, no MCP overhead. |
 | [**agent-core**](https://github.com/agent-sh/agent-core) | Shared libraries synced to all plugins. |
 | [**agent-knowledge**](https://github.com/agent-sh/agent-knowledge) | Research guides and RAG indexes for AI agent development. |
