@@ -1,0 +1,6 @@
+{
+  "name": "CI - Rust",
+  "description": "Rust CI workflow for agent-sh repos",
+  "iconName": "rust",
+  "categories": ["Rust", "CI"]
+}

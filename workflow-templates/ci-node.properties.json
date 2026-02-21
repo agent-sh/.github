@@ -1,0 +1,6 @@
+{
+  "name": "CI - Node.js",
+  "description": "Node.js CI workflow for agent-sh plugin repos",
+  "iconName": "nodejs",
+  "categories": ["Node.js", "CI"]
+}
