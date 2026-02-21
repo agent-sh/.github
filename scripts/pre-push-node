@@ -2,6 +2,8 @@
 # Pre-push hook for Node.js projects
 # Runs tests before allowing push
 
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
 echo "[INFO] Running pre-push tests..."
 npm test
 exit $?

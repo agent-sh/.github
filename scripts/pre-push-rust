@@ -1,7 +1,9 @@
 #!/bin/sh
 # Pre-push hook for Rust projects
-# Runs tests before allowing push
+# Runs clippy and tests before allowing push
 
-echo "[INFO] Running pre-push tests..."
-cargo test
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+echo "[INFO] Running pre-push checks..."
+cargo clippy --workspace -- -D warnings && cargo test --workspace
 exit $?

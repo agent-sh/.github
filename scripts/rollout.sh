@@ -5,8 +5,6 @@
 #   sh scripts/rollout.sh            # Create PRs in all repos
 #   sh scripts/rollout.sh --dry-run  # Show what would happen without making changes
 
-set -e
-
 DRY_RUN=false
 if [ "$1" = "--dry-run" ]; then
   DRY_RUN=true
@@ -21,8 +19,28 @@ BRANCH="add-ci-workflows"
 NODE_REPOS="web-ctl next-task deslop ship perf audit-project sync-docs repo-map drift-detect debate consult learn enhance agent-core agent-knowledge agent-sh.dev"
 RUST_REPOS="agnix"
 
-TMPDIR="$(mktemp -d)"
-trap 'rm -rf "$TMPDIR"' EXIT
+# Validate source files exist before starting
+MISSING=""
+for f in \
+  "$ORG_GITHUB_DIR/workflow-templates/ci-node.yml" \
+  "$ORG_GITHUB_DIR/workflow-templates/ci-rust.yml" \
+  "$ORG_GITHUB_DIR/workflow-templates/claude-code-review.yml" \
+  "$ORG_GITHUB_DIR/workflow-templates/claude-mentions.yml" \
+  "$ORG_GITHUB_DIR/scripts/setup-hooks.sh" \
+  "$ORG_GITHUB_DIR/scripts/pre-push-node" \
+  "$ORG_GITHUB_DIR/scripts/pre-push-rust"; do
+  if [ ! -f "$f" ]; then
+    echo "[ERROR] Missing source file: $f"
+    MISSING="yes"
+  fi
+done
+if [ "$MISSING" = "yes" ]; then
+  echo "[ERROR] Cannot proceed - missing source files"
+  exit 1
+fi
+
+WORK_DIR="$(mktemp -d)"
+trap 'rm -rf "$WORK_DIR"' EXIT
 
 rollout_repo() {
   REPO="$1"
@@ -41,7 +59,7 @@ rollout_repo() {
     return
   fi
 
-  CLONE_DIR="$TMPDIR/$REPO"
+  CLONE_DIR="$WORK_DIR/$REPO"
 
   # Clone
   if ! gh repo clone "agent-sh/$REPO" "$CLONE_DIR" -- --depth 1 2>/dev/null; then
@@ -49,56 +67,59 @@ rollout_repo() {
     return
   fi
 
-  cd "$CLONE_DIR"
+  # Run in subshell to isolate working directory changes
+  (
+    cd "$CLONE_DIR"
 
-  # Check if branch already exists on remote
-  if git ls-remote --heads origin "$BRANCH" | grep -q "$BRANCH"; then
-    echo "[WARN] Branch $BRANCH already exists on agent-sh/$REPO - skipping"
-    return
-  fi
+    # Check if branch already exists on remote
+    if git ls-remote --heads origin "$BRANCH" | grep -qF "refs/heads/$BRANCH"; then
+      echo "[WARN] Branch $BRANCH already exists on agent-sh/$REPO - skipping"
+      exit 0
+    fi
 
-  git checkout -b "$BRANCH"
+    git checkout -b "$BRANCH"
 
-  # CI workflow
-  mkdir -p .github/workflows
-  if [ "$REPO_TYPE" = "rust" ]; then
-    cp "$ORG_GITHUB_DIR/workflow-templates/ci-rust.yml" .github/workflows/ci.yml
-  else
-    cp "$ORG_GITHUB_DIR/workflow-templates/ci-node.yml" .github/workflows/ci.yml
-  fi
+    # CI workflow
+    mkdir -p .github/workflows
+    if [ "$REPO_TYPE" = "rust" ]; then
+      cp "$ORG_GITHUB_DIR/workflow-templates/ci-rust.yml" .github/workflows/ci.yml
+    else
+      cp "$ORG_GITHUB_DIR/workflow-templates/ci-node.yml" .github/workflows/ci.yml
+    fi
 
-  # Claude Code workflows
-  cp "$ORG_GITHUB_DIR/workflow-templates/claude-code-review.yml" .github/workflows/claude-code-review.yml
-  cp "$ORG_GITHUB_DIR/workflow-templates/claude-mentions.yml" .github/workflows/claude.yml
+    # Claude Code workflows
+    cp "$ORG_GITHUB_DIR/workflow-templates/claude-code-review.yml" .github/workflows/claude-code-review.yml
+    cp "$ORG_GITHUB_DIR/workflow-templates/claude-mentions.yml" .github/workflows/claude.yml
 
-  # Hook scripts
-  mkdir -p scripts
-  cp "$ORG_GITHUB_DIR/scripts/setup-hooks.sh" scripts/setup-hooks.sh
-  if [ "$REPO_TYPE" = "rust" ]; then
-    cp "$ORG_GITHUB_DIR/scripts/pre-push-rust" scripts/pre-push-rust
-  else
-    cp "$ORG_GITHUB_DIR/scripts/pre-push-node" scripts/pre-push-node
-  fi
-  chmod +x scripts/*.sh scripts/pre-push-* 2>/dev/null || true
+    # Hook scripts
+    mkdir -p scripts
+    cp "$ORG_GITHUB_DIR/scripts/setup-hooks.sh" scripts/setup-hooks.sh
+    if [ "$REPO_TYPE" = "rust" ]; then
+      cp "$ORG_GITHUB_DIR/scripts/pre-push-rust" scripts/pre-push-rust
+    else
+      cp "$ORG_GITHUB_DIR/scripts/pre-push-node" scripts/pre-push-node
+    fi
+    chmod +x scripts/setup-hooks.sh scripts/pre-push-*
 
-  # Commit and push
-  git add -A
-  git commit -m "$(cat <<'EOF'
+    # Commit and push - stage only specific files
+    git add .github/workflows/ scripts/
+    git commit -m "$(cat <<'EOF'
 ci: add shared CI workflows, Claude Code review, and git hooks
 
 - CI workflow calling reusable workflow from agent-sh/.github
-- Claude Code automated PR review (owner-only, max 3 runs)
+- Claude Code automated PR review (owner/member/collaborator only, max 3 runs)
 - Claude Code @mentions support
 - Pre-push hook running tests before push
 EOF
 )"
 
-  git push -u origin "$BRANCH"
+    git push -u origin "$BRANCH"
 
-  # Create PR
-  gh pr create \
-    --title "ci: add shared CI workflows and hooks" \
-    --body "$(cat <<'EOF'
+    # Create PR
+    gh pr create \
+      --repo "agent-sh/$REPO" \
+      --title "ci: add shared CI workflows and hooks" \
+      --body "$(cat <<'EOF'
 ## Summary
 
 - Adds CI workflow (reusable from agent-sh/.github)
@@ -119,7 +140,12 @@ EOF
 EOF
 )"
 
-  echo "[OK] PR created for agent-sh/$REPO"
+    echo "[OK] PR created for agent-sh/$REPO"
+  )
+
+  if [ $? -ne 0 ]; then
+    echo "[ERROR] Rollout failed for agent-sh/$REPO - continuing with next repo"
+  fi
 }
 
 # Roll out to Node repos

@@ -12,27 +12,26 @@ on:
 
 jobs:
   claude-mention:
-    # Only run when @claude is mentioned and user is repo owner
     if: |
       (
         github.event_name == 'issue_comment' &&
         contains(github.event.comment.body, '@claude') &&
-        github.event.comment.author_association == 'OWNER'
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
       ) ||
       (
         github.event_name == 'pull_request_review_comment' &&
         contains(github.event.comment.body, '@claude') &&
-        github.event.comment.author_association == 'OWNER'
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
       ) ||
       (
         github.event_name == 'pull_request_review' &&
         contains(github.event.review.body, '@claude') &&
-        github.event.review.author_association == 'OWNER'
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.review.author_association)
       ) ||
       (
         github.event_name == 'issues' &&
         (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) &&
-        github.event.issue.author_association == 'OWNER'
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
       )
 
     runs-on: ubuntu-latest
@@ -42,7 +41,6 @@ jobs:
       pull-requests: write
       issues: write
       actions: read
-      id-token: write
 
     steps:
       - name: Checkout repository
@@ -54,5 +52,6 @@ jobs:
         uses: anthropics/claude-code-action@f64219702d7454cf29fe32a74104be6ed43dc637 # v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          model: claude-opus-4-5-20251101
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          model: claude-opus-4-6-20250116
           use_commit_signing: true

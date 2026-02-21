@@ -9,3 +9,4 @@ on:
 jobs:
   ci:
     uses: agent-sh/.github/.github/workflows/ci-rust.yml@main
+    secrets: inherit
