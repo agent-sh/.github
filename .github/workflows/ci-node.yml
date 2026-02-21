@@ -1,4 +1,4 @@
-name: CI (Node.js)
+name: CI - Node.js
 
 on:
   workflow_call:
@@ -14,14 +14,23 @@ on:
         type: string
         default: 'npm test'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ inputs.node-version }}
           cache: 'npm'
+
       - run: npm ci
-      - run: ${{ inputs.test-command }}
+
+      - name: Run tests
+        env:
+          TEST_CMD: ${{ inputs.test-command }}
+        run: $TEST_CMD

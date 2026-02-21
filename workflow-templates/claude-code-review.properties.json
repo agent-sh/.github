@@ -1,0 +1,6 @@
+{
+  "name": "Claude Code - Automated PR Review",
+  "description": "Automated PR review using Claude Code for agent-sh repos",
+  "iconName": "cloud",
+  "categories": ["CI", "Review"]
+}
