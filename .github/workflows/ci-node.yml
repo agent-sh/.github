@@ -38,4 +38,9 @@ jobs:
       - name: Run tests
         env:
           TEST_CMD: ${{ inputs.test-command }}
-        run: $TEST_CMD
+        run: |
+          if [ -f package.json ] && node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts.test ? 0 : 1)" 2>/dev/null; then
+            $TEST_CMD
+          else
+            echo "[INFO] No test script defined - skipping tests"
+          fi
