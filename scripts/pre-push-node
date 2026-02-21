@@ -1,0 +1,7 @@
+#!/bin/sh
+# Pre-push hook for Node.js projects
+# Runs tests before allowing push
+
+echo "[INFO] Running pre-push tests..."
+npm test
+exit $?
