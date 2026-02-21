@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - uses: dtolnay/rust-toolchain@a54c7afe936401765a5605df8a934cdeb93a31be
+      - uses: dtolnay/rust-toolchain@efa25f7f19611383d5b0ccf2d1c8914531636bf9 # master
         with:
           toolchain: ${{ inputs.rust-version }}
           components: clippy, rustfmt
