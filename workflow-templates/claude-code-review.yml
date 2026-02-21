@@ -65,7 +65,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          model: claude-opus-4-6-20250116
+          model: claude-opus-4-6
           use_commit_signing: true
 
       - name: Comment on PR (skipped)

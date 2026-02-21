@@ -11,6 +11,16 @@ if [ "$1" = "--dry-run" ]; then
   echo "[INFO] Dry run mode - no changes will be made"
 fi
 
+# Verify gh CLI is available and authenticated
+if ! command -v gh >/dev/null 2>&1; then
+  echo "[ERROR] gh CLI not found - install from https://cli.github.com"
+  exit 1
+fi
+if ! gh auth status >/dev/null 2>&1; then
+  echo "[ERROR] gh CLI not authenticated - run 'gh auth login'"
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ORG_GITHUB_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BRANCH="add-ci-workflows"
