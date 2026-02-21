@@ -1,0 +1,72 @@
+name: Sync Core Lib
+
+# Called by agent-core repo on merge to main
+# Opens PRs in consuming repos with updated lib/
+
+on:
+  workflow_call:
+    inputs:
+      source-repo:
+        description: 'Source repo (org/name)'
+        required: true
+        type: string
+      target-repos:
+        description: 'JSON array of target repos'
+        required: true
+        type: string
+      lib-path:
+        description: 'Path to lib directory in source'
+        required: false
+        type: string
+        default: 'lib'
+    secrets:
+      SYNC_TOKEN:
+        description: 'PAT with repo scope for cross-repo PRs'
+        required: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ${{ fromJson(inputs.target-repos) }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.source-repo }}
+          path: source
+
+      - name: Checkout target
+        uses: actions/checkout@v4
+        with:
+          repository: agent-sh/${{ matrix.repo }}
+          token: ${{ secrets.SYNC_TOKEN }}
+          path: target
+
+      - name: Sync lib
+        run: |
+          rm -rf target/${{ inputs.lib-path }}/
+          cp -r source/${{ inputs.lib-path }}/ target/${{ inputs.lib-path }}/
+
+      - name: Check for changes
+        id: diff
+        working-directory: target
+        run: |
+          git diff --quiet && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Create PR
+        if: steps.diff.outputs.changed == 'true'
+        working-directory: target
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          BRANCH="chore/sync-core-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git add ${{ inputs.lib-path }}/
+          git commit -m "chore: sync core lib from agent-core"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "chore: sync core lib from agent-core" \
+            --body "Automated sync of \`${{ inputs.lib-path }}/\` from [agent-core](https://github.com/${{ inputs.source-repo }})." \
+            --head "$BRANCH"
