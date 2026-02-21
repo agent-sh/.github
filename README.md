@@ -27,7 +27,7 @@ jobs:
 
 ### ci-rust.yml
 
-Reusable Rust CI workflow. Steps: checkout, install toolchain, `cargo check`, `cargo clippy`, `cargo test`.
+Reusable Rust CI workflow. Steps: checkout, install toolchain, `cargo fmt --check`, `cargo clippy`, `cargo test`.
 
 **Inputs:**
 
@@ -51,7 +51,7 @@ Located in `workflow-templates/`, these are available in the GitHub "New workflo
 |----------|-------------|
 | `ci-node.yml` | Thin caller for the reusable Node.js CI workflow |
 | `ci-rust.yml` | Thin caller for the reusable Rust CI workflow |
-| `claude-code-review.yml` | Automated PR review via Claude Code (owner-only, max 3 runs per PR) |
+| `claude-code-review.yml` | Automated PR review via Claude Code (owner/member/collaborator, max 3 runs per PR) |
 | `claude-mentions.yml` | Respond to @claude mentions in issues and PRs |
 
 ## Scripts
