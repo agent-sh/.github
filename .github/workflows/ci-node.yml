@@ -26,9 +26,14 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ inputs.node-version }}
-          cache: 'npm'
 
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f package.json ]; then
+            npm install --no-save
+          fi
 
       - name: Run tests
         env:
