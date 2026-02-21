@@ -1,0 +1,6 @@
+{
+  "name": "Claude Code - @mentions",
+  "description": "Respond to @claude mentions in issues and PRs for agent-sh repos",
+  "iconName": "cloud",
+  "categories": ["CI", "Automation"]
+}

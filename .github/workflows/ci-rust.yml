@@ -1,0 +1,35 @@
+name: CI - Rust
+
+on:
+  workflow_call:
+    inputs:
+      rust-version:
+        description: 'Rust toolchain version'
+        required: false
+        type: string
+        default: 'stable'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: dtolnay/rust-toolchain@a54c7afe936401765a5605df8a934cdeb93a31be
+        with:
+          toolchain: ${{ inputs.rust-version }}
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2
+
+      - name: Format check
+        run: cargo fmt --check --all
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
+
+      - name: Test
+        run: cargo test --workspace
