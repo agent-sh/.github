@@ -13,6 +13,7 @@ agent-sh.dev/    → Website
 audit-project/   → Multi-agent code review plugin
 consult/         → Consultation plugin
 debate/          → Debate orchestration plugin
+design-system/   → Shared CSS design tokens and base styles for all ecosystem sites
 deslop/          → AI slop cleanup plugin
 drift-detect/    → Plan vs implementation comparison plugin
 enhance/         → Enhancement analyzers plugin
