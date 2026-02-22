@@ -2,7 +2,7 @@
 # design-system/check-sync.sh
 #
 # Verifies that consumer CSS files import from the shared design-system.
-# Run from the monorepo root.
+# ROOT is resolved relative to this script's location, not the caller's cwd.
 
 set -euo pipefail
 
@@ -15,23 +15,24 @@ check_import() {
   local label="$3"
 
   if [ ! -f "$file" ]; then
-    echo "[WARN] $label: file not found at $file (submodule may not be initialized)"
+    echo "[ERROR] $label: file not found at $file"
+    ERRORS=$((ERRORS + 1))
     return
   fi
 
-  if ! grep -q "$pattern" "$file"; then
-    echo "[ERROR] $label: missing @import for design-system"
-    echo "  Expected pattern: $pattern"
+  if ! grep -qE "^@import.*$pattern" "$file"; then
+    echo "[ERROR] $label: missing active @import for $pattern"
     echo "  File: $file"
     ERRORS=$((ERRORS + 1))
   else
-    echo "[OK] $label"
+    echo "[OK] $label: $pattern"
   fi
 }
 
 echo "Checking design-system sync..."
 echo ""
 
+# All consumers must import tokens.css
 check_import \
   "$ROOT/agentsys/site/assets/css/tokens.css" \
   "design-system/tokens.css" \
@@ -47,9 +48,26 @@ check_import \
   "design-system/tokens.css" \
   "agnix"
 
+# Non-Docusaurus consumers must import base.css
+check_import \
+  "$ROOT/agentsys/site/assets/css/tokens.css" \
+  "design-system/base.css" \
+  "agentsys (base)"
+
+check_import \
+  "$ROOT/agent-sh.dev/src/styles/tokens.css" \
+  "design-system/base.css" \
+  "agent-sh.dev (base)"
+
+# Docusaurus consumers must import the bridge
+check_import \
+  "$ROOT/agnix/website/src/css/custom.css" \
+  "design-system/tokens-docusaurus.css" \
+  "agnix (docusaurus bridge)"
+
 echo ""
 if [ "$ERRORS" -gt 0 ]; then
-  echo "[ERROR] $ERRORS consumer(s) out of sync with design-system"
+  echo "[ERROR] $ERRORS check(s) failed"
   exit 1
 else
   echo "[OK] All consumers are importing from the shared design-system"

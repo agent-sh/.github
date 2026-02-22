@@ -15,13 +15,17 @@
  */
 
 /* --------------------------------------------------------------------------
- * GOOGLE FONTS IMPORT
- * Inter: Designed for screens, excellent legibility at all sizes, precise
- *        metrics for UI text. The industry standard for developer tools.
- * JetBrains Mono: Purpose-built for code. Distinguishes Il1, O0. Ligatures
- *                 for common operators (=>, ->, !=). Feels native to devs.
+ * FONTS
+ *
+ * Required: Inter + JetBrains Mono (Google Fonts or self-hosted).
+ * Each consumer site must load fonts via HTML <link> tags, NOT @import here.
+ * This avoids render-blocking CSS @import chains.
+ *
+ * Recommended <link> tags (add to each site's <head>):
+ *   <link rel="preconnect" href="https://fonts.googleapis.com">
+ *   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ *   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
  * -------------------------------------------------------------------------- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* --------------------------------------------------------------------------
  * ROOT TOKENS
@@ -101,7 +105,7 @@
   --gradient-accent:       linear-gradient(135deg, #a855f7, #06b6d4);
   --gradient-accent-hover: linear-gradient(135deg, #c084fc, #22d3ee);
   --gradient-accent-text:  linear-gradient(135deg, #c084fc, #22d3ee);
-  --gradient-accent-subtle:linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15));
+  --gradient-accent-subtle: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15));
 
   /* Accent as solid colors for simpler contexts */
   --color-accent-primary:  #a855f7;  /* Primary accent when gradient not possible            */

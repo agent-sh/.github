@@ -20,11 +20,14 @@
   --ifm-code-font-size: 95%;
 
   /* Shape */
-  --ifm-global-radius: 6px;
+  --ifm-global-radius: var(--radius-default);
 
   /* Code blocks - light mode defaults */
   --prism-background-color: #f6f8fa;
   --ifm-code-background: #f0f2f5;
+
+  /* Link color uses shared accent */
+  --ifm-link-color: var(--color-accent-purple);
 }
 
 html[data-theme='dark'] {
@@ -38,5 +41,5 @@ html[data-theme='dark'] {
 
   /* Code blocks */
   --prism-background-color: var(--color-bg-code);
-  --ifm-code-background: rgba(110, 118, 129, 0.2);
+  --ifm-code-background: rgba(var(--color-zinc-rgb), 0.2);
 }
