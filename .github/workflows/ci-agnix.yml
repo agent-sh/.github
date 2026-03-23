@@ -17,3 +17,4 @@ jobs:
         with:
           config: '.agnix.toml'
           fail-on-error: 'true'
+          version: 'v0.16.2'
