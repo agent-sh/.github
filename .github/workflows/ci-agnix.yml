@@ -13,8 +13,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Validate agent configurations
-        uses: agent-sh/agnix@v0.16.1
+        uses: agent-sh/agnix@v0.16.5
         with:
           config: '.agnix.toml'
           fail-on-error: 'true'
-          version: 'v0.16.2'
