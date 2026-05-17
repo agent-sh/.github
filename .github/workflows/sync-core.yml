@@ -24,6 +24,9 @@ on:
         description: 'PAT with repo scope for cross-repo PRs'
         required: true
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   sync:
     runs-on: ubuntu-latest

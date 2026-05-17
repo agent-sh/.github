@@ -7,7 +7,7 @@ on:
         description: 'Node.js version'
         required: false
         type: string
-        default: '22'
+        default: '24'
       test-command:
         description: 'Test command to run'
         required: false
@@ -16,6 +16,9 @@ on:
 
 permissions:
   contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   test:
