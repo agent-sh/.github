@@ -26,6 +26,7 @@
 | **[agentsys](https://github.com/agent-sh/agentsys)** | Plugin marketplace and orchestration runtime for coding agents. 24 plugins, 50 agents, 45 skills across Claude Code, Codex, OpenCode, Cursor, and Kiro. |
 | **[agnix](https://github.com/agent-sh/agnix)** | Linter and LSP for agent configuration. 423 rules across `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, hooks, MCP — the validation skills don't get anywhere else. CLI, LSP, editor extensions, GitHub Action. |
 | **[computer-use-linux](https://github.com/agent-sh/computer-use-linux)** | MCP server for native Linux desktop control. AT-SPI accessibility trees, real Wayland support, multi-compositor window targeting (GNOME, KDE, Hyprland, i3, COSMIC). 15 tools, Rust. |
+| **[agent-workspace-linux](https://github.com/agent-sh/agent-workspace-linux)** | Isolated Linux desktops for AI agents. A hidden, agent-owned desktop and browser over MCP, so an agent does GUI and web work without touching your real desktop. Rust. |
 | **[parlar](https://github.com/agent-sh/parlar)** | Voice conversation mode for Claude Code and Codex. Talk to a running session and it answers out loud while it works; push through hooks, no terminal injection. Local CPU models (Phonon-2, Kokoro), GNOME swarm indicator. Rust. |
 
 ```bash
