@@ -1,73 +1,62 @@
-<h1 align="center">agent-sh</h1>
+# agent-sh
 
-<p align="center">
-  <strong>Code does code work. AI does AI work.</strong>
-</p>
+Tools and infrastructure for coding agents. Software keeps the state, gates, permissions, memory and hardware bridges; models write code and make calls. Built for Claude Code, Codex, OpenCode, Cursor, Kiro and MCP hosts.
 
-<p align="center">
-  Open-source tooling for coding agents — Claude Code, Codex, OpenCode, Cursor, Kiro, and MCP hosts.
-</p>
+## Projects
 
-<p align="center">
-  <b>24 plugins · 50 agents · 45 skills · 423 lint rules · 15 desktop MCP tools</b>
-</p>
-
-<p align="center"><em>New plugins, validators, and MCPs ship constantly. Follow for updates:</em></p>
-<p align="center">
-  <a href="https://x.com/avi_fenesh"><img src="https://img.shields.io/badge/Follow-@avi__fenesh-1DA1F2?style=for-the-badge&logo=x&logoColor=white" alt="Follow on X"></a>
-</p>
-
----
-
-## Start here
-
-| Project | What it is |
+| Project | What it does |
 |---|---|
-| **[agentsys](https://github.com/agent-sh/agentsys)** | Plugin marketplace and orchestration runtime for coding agents. 24 plugins, 50 agents, 45 skills across Claude Code, Codex, OpenCode, Cursor, and Kiro. |
-| **[agnix](https://github.com/agent-sh/agnix)** | Linter and LSP for agent configuration. 423 rules across `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, hooks, MCP — the validation skills don't get anywhere else. CLI, LSP, editor extensions, GitHub Action. |
-| **[computer-use-linux](https://github.com/agent-sh/computer-use-linux)** | MCP server for native Linux desktop control. AT-SPI accessibility trees, real Wayland support, multi-compositor window targeting (GNOME, KDE, Hyprland, i3, COSMIC). 15 tools, Rust. |
-| **[agent-workspace-linux](https://github.com/agent-sh/agent-workspace-linux)** | Isolated Linux desktops for AI agents. A hidden, agent-owned desktop and browser over MCP, so an agent does GUI and web work without touching your real desktop. Rust. |
-| **[parlar](https://github.com/agent-sh/parlar)** | Voice conversation mode for Claude Code and Codex. Talk to a running session and it answers out loud while it works; push through hooks, no terminal injection. Local CPU models (Phonon-2, Kokoro), GNOME swarm indicator. Rust. |
+| **[agentsys](https://github.com/agent-sh/agentsys)** | Plugin marketplace and workflow runtime for coding agents. 24 plugins, 50 agents and 44 skills across Claude Code, Codex, OpenCode, Cursor and Kiro. |
+| **[tower-crane](https://github.com/agent-sh/tower-crane)** | Plan, dispatch, review and merge agent work from one issue to a whole project. State lives in plain `.tower-crane/` files; workers run in isolated worktrees and sandboxes; software gates and an independent fresh-context reviewer guard the merge. |
+| **[agnix](https://github.com/agent-sh/agnix)** | Linter and language server for agent configs. 455 rules with autofixes across `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, hooks and MCP. Ships as a CLI, LSP, GitHub Action, and VS Code, JetBrains, Neovim and Zed extensions. |
+| **[tacit](https://github.com/agent-sh/tacit)** | Fact memory for coding agents in plain Markdown and git, local or shared across machines. Lexical FTS5 retrieval, git-derived facts (hot spots, co-change, module map, measured results, staleness), and a verifier grounded in code, git history and the owner's words. |
+| **[tools](https://github.com/agent-sh/tools)** | Agent tools built for how LLMs actually call tools: `read`, `write`/`edit`, `grep`, `glob`, `bash`, `batch`, `webfetch`, `websearch`, `lsp` and `skill`. Typed union results, recovery hints on every error, and fail-closed workspace permissions in TypeScript (`@agent-sh/harness-*`) and Rust (`harness-tools`). Includes **[`@agent-sh/harness-web-mcp`](https://github.com/agent-sh/tools/tree/main/packages/web-mcp)** for keyless `websearch` and SSRF-guarded `webfetch` over MCP. |
+| **[computer-use-linux](https://github.com/agent-sh/computer-use-linux)** | Native Linux desktop control over MCP. AT-SPI accessibility selectors, Wayland portals and window targeting across GNOME, KDE, Hyprland, i3/Sway and COSMIC. 15 tools in Rust. |
+| **[agent-workspace-linux](https://github.com/agent-sh/agent-workspace-linux)** | Isolated Linux desktops for AI agents over MCP. Gives an agent its own hidden display, window manager and browser so it can run and QA GUI and web work without touching your real desktop. Rust. |
+| **[agent-chrome-bridge](https://github.com/agent-sh/agent-chrome-bridge)** | Shared local Chrome bridge for Claude Code and Codex. Lets agents drive the Chrome you already have open (your tabs, logins and profile) through one local broker and native messaging host, with compact element lists, tab locks and URL guards. |
+| **[parlar](https://github.com/agent-sh/parlar)** | Voice conversation mode for Claude Code and Codex. Talk to a running session, idle or mid-work, and it answers out loud while diffs and logs stay in the terminal. Pushes speech through hooks without terminal injection; runs locally on the CPU (Phonon-2, Kokoro). Rust. |
+| **[linubot](https://github.com/agent-sh/linubot)** | Linux desktop app for your own team of AI helpers, with per-bot model providers, memory, isolated computer workspaces and private phone access. |
+
+## Quick start
 
 ```bash
+# Workflows, project orchestration, and config linting
 npm install -g agentsys && agentsys
+npm install -g @agent-sh/tower-crane
 npx agnix .
+
+# Keyless web search and web fetch MCP (Claude Code / Codex)
+claude mcp add -s user harness-web -- npx -y @agent-sh/harness-web-mcp
+codex mcp add harness-web -- npx -y @agent-sh/harness-web-mcp
+
+# Shared Chrome bridge, Linux computer use, and local voice mode
+npx @agent-sh/chrome-bridge@latest setup
 npm install -g @agent-sh/computer-use-linux
 cargo install parlar parlard && parlard fetch && parlard service
 ```
 
-## Why this exists
+## How it is built
 
-AI writes code. That's the easy part now. The work around it was the bottleneck:
-
-- **Skills don't trigger** when their config has the wrong field. Vercel's research found skills [invoke at 0%](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) without correct syntax — and you find out after the fact.
-- **"Computer use" MCPs only work on macOS.** The Linux options drive `xdotool` against X11 and pretend Wayland doesn't exist.
-- **Context doesn't survive a session.** You restate the same project decisions every time, or you bloat `AGENTS.md` until it stops being read.
-- **Reviews happen by vibes.** CI breaks at the worst time.
-
-I built these tools for myself first. Posting them here in case they're useful to you too.
-
-Three principles shape everything in this org:
-
-- Deterministic tools do detection. Models do judgment.
-- A workflow is a pipeline with gates, not a monolith.
-- Configuration should fail loudly before production work depends on it.
+- **Software holds the state and the gates.** Plans, task leases, memory facts and review receipts live in plain files and git, not inside a context window that gets compacted. Tests, linters and `deslop` run at the exact commit before an independent reviewer sees the diff.
+- **Tools are shaped for model callers.** Models guess parameter names, misremember paths and retry on whatever an error says. Every tool in [`tools`](https://github.com/agent-sh/tools) returns a typed union instead of throwing, answers wrong field names with targeted hints, and lists candidate paths or match locations on `NOT_FOUND` and `OLD_STRING_NOT_UNIQUE`.
+- **Config and memory are checked against sources.** [`agnix`](https://github.com/agent-sh/agnix) catches broken `SKILL.md`, `AGENTS.md`, hook and MCP files before an agent silently ignores them. [`tacit`](https://github.com/agent-sh/tacit) checks stored facts against code, git history and the owner's own words instead of letting stale notes accumulate.
+- **Real desktop and browser surfaces, fenced.** [`computer-use-linux`](https://github.com/agent-sh/computer-use-linux) speaks AT-SPI and Wayland portals; [`agent-workspace-linux`](https://github.com/agent-sh/agent-workspace-linux) gives the agent a separate display and browser; [`agent-chrome-bridge`](https://github.com/agent-sh/agent-chrome-bridge) shares your open Chrome with tab locks and URL guards.
 
 <details>
-<summary><strong>Also in the ecosystem</strong> — plugins, memory, infra</summary>
+<summary><strong>Plugins, skills and shared libraries</strong></summary>
 
 **Workflows** · [next-task](https://github.com/agent-sh/next-task) · [prepare-delivery](https://github.com/agent-sh/prepare-delivery) · [audit-project](https://github.com/agent-sh/audit-project) · [ship](https://github.com/agent-sh/ship) · [gate-and-ship](https://github.com/agent-sh/gate-and-ship) · [deslop](https://github.com/agent-sh/deslop) · [enhance](https://github.com/agent-sh/enhance) · [sync-docs](https://github.com/agent-sh/sync-docs) · [drift-detect](https://github.com/agent-sh/drift-detect) · [perf](https://github.com/agent-sh/perf)
 
-**Memory & curation** · [axiom](https://github.com/agent-sh/axiom) · [banthis](https://github.com/agent-sh/banthis) · [skill-curator](https://github.com/agent-sh/skill-curator) · [system-prompt-curator](https://github.com/agent-sh/system-prompt-curator)
+**Skills and consultation** · [onboard](https://github.com/agent-sh/onboard) · [can-i-help](https://github.com/agent-sh/can-i-help) · [learn](https://github.com/agent-sh/learn) · [consult](https://github.com/agent-sh/consult) · [debate](https://github.com/agent-sh/debate) · [skillers](https://github.com/agent-sh/skillers) · [ada-spark](https://github.com/agent-sh/ada-spark) · [mojo](https://github.com/agent-sh/mojo) · [glidemq](https://github.com/agent-sh/glidemq) · [zig-lsp](https://github.com/agent-sh/zig-lsp)
 
-**Skills** · [onboard](https://github.com/agent-sh/onboard) · [can-i-help](https://github.com/agent-sh/can-i-help) · [learn](https://github.com/agent-sh/learn) · [consult](https://github.com/agent-sh/consult) · [debate](https://github.com/agent-sh/debate) · [skillers](https://github.com/agent-sh/skillers)
+**Curation and research** · [banthis](https://github.com/agent-sh/banthis) · [skill-curator](https://github.com/agent-sh/skill-curator) · [system-prompt-curator](https://github.com/agent-sh/system-prompt-curator) · [agent-knowledge](https://github.com/agent-sh/agent-knowledge)
 
-**Infra** · [agent-analyzer](https://github.com/agent-sh/agent-analyzer) · [agent-core](https://github.com/agent-sh/agent-core) · [repo-intel](https://github.com/agent-sh/repo-intel)
-
-**Bridges** · [glidemq](https://github.com/agent-sh/glidemq)
+**Core and analysis** · [agent-analyzer](https://github.com/agent-sh/agent-analyzer) · [agent-core](https://github.com/agent-sh/agent-core) · [repo-intel](https://github.com/agent-sh/repo-intel)
 
 </details>
 
 ---
 
-<sub>Built and maintained by <strong><a href="https://github.com/avifenesh">Avi Fenesh</a></strong> — Valkey contributor and Valkey GLIDE maintainer. Solo-maintained. Contributions welcome if they fit — please follow <a href="../CONTRIBUTING.md">CONTRIBUTING.md</a>.</sub>
+Built and maintained by **[Avi Fenesh](https://github.com/avifenesh)** ([avifenesh.ai](https://avifenesh.ai) · [@avi_fenesh](https://x.com/avi_fenesh)), founder of **[Tiyuvta](https://tiyuvta.ai)** and **[Valkey GLIDE](https://github.com/valkey-io/valkey-glide)** maintainer.
+
+If you enjoy these tools and want to help cover the tokens, you can **[sponsor on GitHub](https://github.com/sponsors/avifenesh)**.
