@@ -15,7 +15,6 @@ Tools and infrastructure for coding agents. Software keeps the state, gates, per
 | **[agent-workspace-linux](https://github.com/agent-sh/agent-workspace-linux)** | Isolated Linux desktops for AI agents over MCP. Gives an agent its own hidden display, window manager and browser so it can run and QA GUI and web work without touching your real desktop. Rust. |
 | **[agent-chrome-bridge](https://github.com/agent-sh/agent-chrome-bridge)** | Shared local Chrome bridge for Claude Code and Codex. Lets agents drive the Chrome you already have open (your tabs, logins and profile) through one local broker and native messaging host, with compact element lists, tab locks and URL guards. |
 | **[parlar](https://github.com/agent-sh/parlar)** | Voice conversation mode for Claude Code and Codex. Talk to a running session, idle or mid-work, and it answers out loud while diffs and logs stay in the terminal. Pushes speech through hooks without terminal injection; runs locally on the CPU (Phonon-2, Kokoro). Rust. |
-| **[linubot](https://github.com/agent-sh/linubot)** | Linux desktop app for your own team of AI helpers, with per-bot model providers, memory, isolated computer workspaces and private phone access. |
 
 ## Quick start
 
