@@ -59,7 +59,7 @@ Reusable CodeQL analysis, one job per language.
 
 | Input | Default | Description |
 |-------|---------|-------------|
-| `languages` | `javascript-typescript` | Comma-separated CodeQL languages |
+| `languages` | `javascript-typescript` | Comma-separated CodeQL languages, e.g. `javascript-typescript,python` |
 
 ### sync-core.yml
 
