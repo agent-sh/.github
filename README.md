@@ -8,13 +8,13 @@ Located in `.github/workflows/`, these are called via `workflow_call` from indiv
 
 ### ci-node.yml
 
-Reusable Node.js CI workflow. Steps: checkout, setup Node, `npm ci`, run tests.
+Reusable Node.js CI workflow. Steps: checkout, setup Node, `npm ci` (`npm install --no-save` when there is no lockfile), run tests. Tests are skipped when `package.json` has no `test` script.
 
 **Inputs:**
 
 | Input | Default | Description |
 |-------|---------|-------------|
-| `node-version` | `20` | Node.js version |
+| `node-version` | `24` | Node.js version |
 | `test-command` | `npm test` | Test command to run |
 
 **Caller example:**
@@ -43,6 +43,36 @@ jobs:
     uses: agent-sh/.github/.github/workflows/ci-rust.yml@main
 ```
 
+### ci-agnix.yml
+
+Reusable agnix workflow. Validates agent configs with the agnix action, reading `.agnix.toml`, and fails on errors. No inputs.
+
+```yaml
+jobs:
+  agnix:
+    uses: agent-sh/.github/.github/workflows/ci-agnix.yml@main
+```
+
+### codeql.yml
+
+Reusable CodeQL analysis, one job per language.
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `languages` | `javascript-typescript` | Comma-separated CodeQL languages |
+
+### sync-core.yml
+
+Copies a lib directory from a source repo into each target repo and opens a PR where it changed.
+
+| Input | Default | Description |
+|-------|---------|-------------|
+| `source-repo` | required | Source repo (`org/name`) |
+| `target-repos` | required | JSON array of agent-sh repo names |
+| `lib-path` | `lib` | Path to the lib directory in the source |
+
+Needs a `SYNC_TOKEN` secret: a PAT with repo scope for the cross-repo PRs.
+
 ## Workflow Templates
 
 Located in `workflow-templates/`, these are available in the GitHub "New workflow" UI for org repos.
@@ -51,7 +81,7 @@ Located in `workflow-templates/`, these are available in the GitHub "New workflo
 |----------|-------------|
 | `ci-node.yml` | Thin caller for the reusable Node.js CI workflow |
 | `ci-rust.yml` | Thin caller for the reusable Rust CI workflow |
-| `claude-code-review.yml` | Automated PR review via Claude Code (owner/member/collaborator, max 3 runs per PR) |
+| `claude-code-review.yml` | Automated PR review via Claude Code (owner/member/collaborator, max 3 runs per head commit) |
 | `claude-mentions.yml` | Respond to @claude mentions in issues and PRs |
 
 ## Scripts
@@ -66,7 +96,7 @@ sh scripts/setup-hooks.sh
 
 ### rollout.sh
 
-Rolls out CI workflows, Claude Code integrations, and hooks to all agent-sh repos by creating PRs.
+Rolls out CI workflows, Claude Code integrations, and hooks to the repos listed in the script (`NODE_REPOS`, `RUST_REPOS`) by creating PRs.
 
 ```bash
 sh scripts/rollout.sh            # Create PRs
@@ -84,7 +114,7 @@ sh scripts/rollout.sh --dry-run  # Preview changes
 For new repos, either:
 
 1. Use the workflow templates from the GitHub UI ("Actions" > "New workflow")
-2. Run `sh scripts/rollout.sh` to bulk-add to all repos
+2. Add the repo to the lists in `scripts/rollout.sh` and run it
 3. Manually copy the caller workflow and scripts
 
 After adding workflows, install the git hook locally:

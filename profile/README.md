@@ -6,9 +6,9 @@ Tools and infrastructure for coding agents. Software keeps the state, gates, per
 
 | Project | What it does |
 |---|---|
-| **[agentsys](https://github.com/agent-sh/agentsys)** | Plugin marketplace and workflow runtime for coding agents. 24 plugins, 50 agents and 44 skills across Claude Code, Codex, OpenCode, Cursor and Kiro. |
-| **[tower-crane](https://github.com/agent-sh/tower-crane)** | Plan, dispatch, review and merge agent work from one issue to a whole project. State lives in plain `.tower-crane/` files; workers run in isolated worktrees and sandboxes; software gates and an independent fresh-context reviewer guard the merge. |
-| **[agnix](https://github.com/agent-sh/agnix)** | Linter and language server for agent configs. 455 rules with autofixes across `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, hooks and MCP. Ships as a CLI, LSP, GitHub Action, and VS Code, JetBrains, Neovim and Zed extensions. |
+| **[agentsys](https://github.com/agent-sh/agentsys)** | Plugin marketplace and workflow runtime for coding agents. 11 plugins, 5 agents and 14 skills across Claude Code, Codex, OpenCode, Cursor and Kiro. |
+| **[foreman](https://github.com/agent-sh/foreman)** | GitHub issues as a task queue for native agents. A session picks and claims the next ready issue, worktree subagents implement it, and foreman lands the PR at the exact head it checked. No daemon: labels, assignees and comments are the state. |
+| **[agnix](https://github.com/agent-sh/agnix)** | Linter and language server for agent configs. 757 rules with autofixes across `CLAUDE.md`, `AGENTS.md`, `SKILL.md`, hooks and MCP. Ships as a CLI, LSP, GitHub Action, and VS Code, JetBrains, Neovim and Zed extensions. |
 | **[tacit](https://github.com/agent-sh/tacit)** | Fact memory for coding agents in plain Markdown and git, local or shared across machines. Lexical FTS5 retrieval, git-derived facts (hot spots, co-change, module map, measured results, staleness), and a verifier grounded in code, git history and the owner's words. |
 | **[tools](https://github.com/agent-sh/tools)** | Agent tools built for how LLMs actually call tools: `read`, `write`/`edit`, `grep`, `glob`, `bash`, `batch`, `webfetch`, `websearch`, `lsp` and `skill`. Typed union results, recovery hints on every error, and fail-closed workspace permissions in TypeScript (`@agent-sh/harness-*`) and Rust (`harness-tools`). Includes **[`@agent-sh/harness-web-mcp`](https://github.com/agent-sh/tools/tree/main/packages/web-mcp)** for keyless `websearch` and SSRF-guarded `webfetch` over MCP. |
 | **[computer-use-linux](https://github.com/agent-sh/computer-use-linux)** | Native Linux desktop control over MCP. AT-SPI accessibility selectors, Wayland portals and window targeting across GNOME, KDE, Hyprland, niri, i3 and COSMIC. Rust. |
@@ -19,9 +19,8 @@ Tools and infrastructure for coding agents. Software keeps the state, gates, per
 ## Quick start
 
 ```bash
-# Workflows, project orchestration, and config linting
+# Workflows and config linting
 npm install -g agentsys && agentsys
-npm install -g @agent-sh/tower-crane
 npx agnix .
 
 # Keyless web search and web fetch MCP (Claude Code / Codex)
@@ -36,7 +35,7 @@ cargo install parlar parlard && parlard fetch && parlard service
 
 ## How it is built
 
-- **Software holds the state and the gates.** Plans, task leases, memory facts and review receipts live in plain files and git, not inside a context window that gets compacted. Tests, linters and `deslop` run at the exact commit before an independent reviewer sees the diff.
+- **Software holds the state and the gates.** Queue state lives in GitHub labels and comments, memory facts in plain files and git, not inside a context window that gets compacted. [`foreman`](https://github.com/agent-sh/foreman) lands a PR only at the head it checked, with every check green and every review finding addressed.
 - **Tools are shaped for model callers.** Models guess parameter names, misremember paths and retry on whatever an error says. Every tool in [`tools`](https://github.com/agent-sh/tools) returns a typed union instead of throwing, answers wrong field names with targeted hints, and lists candidate paths or match locations on `NOT_FOUND` and `OLD_STRING_NOT_UNIQUE`.
 - **Config and memory are checked against sources.** [`agnix`](https://github.com/agent-sh/agnix) catches broken `SKILL.md`, `AGENTS.md`, hook and MCP files before an agent silently ignores them. [`tacit`](https://github.com/agent-sh/tacit) checks stored facts against code, git history and the owner's own words instead of letting stale notes accumulate.
 - **Real desktop and browser surfaces, fenced.** [`computer-use-linux`](https://github.com/agent-sh/computer-use-linux) speaks AT-SPI and Wayland portals; [`agent-workspace-linux`](https://github.com/agent-sh/agent-workspace-linux) gives the agent a separate display and browser; [`agent-chrome-bridge`](https://github.com/agent-sh/agent-chrome-bridge) shares your open Chrome with tab locks and URL guards.
@@ -44,13 +43,13 @@ cargo install parlar parlard && parlard fetch && parlard service
 <details>
 <summary><strong>Plugins, skills and shared libraries</strong></summary>
 
-**Workflows** · [next-task](https://github.com/agent-sh/next-task) · [prepare-delivery](https://github.com/agent-sh/prepare-delivery) · [audit-project](https://github.com/agent-sh/audit-project) · [ship](https://github.com/agent-sh/ship) · [gate-and-ship](https://github.com/agent-sh/gate-and-ship) · [deslop](https://github.com/agent-sh/deslop) · [enhance](https://github.com/agent-sh/enhance) · [sync-docs](https://github.com/agent-sh/sync-docs) · [drift-detect](https://github.com/agent-sh/drift-detect) · [perf](https://github.com/agent-sh/perf)
+**Workflows** · [foreman](https://github.com/agent-sh/foreman) · [deslop](https://github.com/agent-sh/deslop)
 
-**Skills and consultation** · [onboard](https://github.com/agent-sh/onboard) · [can-i-help](https://github.com/agent-sh/can-i-help) · [learn](https://github.com/agent-sh/learn) · [consult](https://github.com/agent-sh/consult) · [debate](https://github.com/agent-sh/debate) · [skillers](https://github.com/agent-sh/skillers) · [ada-spark](https://github.com/agent-sh/ada-spark) · [mojo](https://github.com/agent-sh/mojo) · [glidemq](https://github.com/agent-sh/glidemq) · [zig-lsp](https://github.com/agent-sh/zig-lsp)
+**Skills** · [learn](https://github.com/agent-sh/learn) · [skillers](https://github.com/agent-sh/skillers) · [ada-spark](https://github.com/agent-sh/ada-spark) · [mojo](https://github.com/agent-sh/mojo) · [glidemq](https://github.com/agent-sh/glidemq) · [zig-lsp](https://github.com/agent-sh/zig-lsp)
 
 **Curation and research** · [banthis](https://github.com/agent-sh/banthis) · [skill-curator](https://github.com/agent-sh/skill-curator) · [system-prompt-curator](https://github.com/agent-sh/system-prompt-curator) · [agent-knowledge](https://github.com/agent-sh/agent-knowledge)
 
-**Core and analysis** · [agent-analyzer](https://github.com/agent-sh/agent-analyzer) · [agent-core](https://github.com/agent-sh/agent-core) · [repo-intel](https://github.com/agent-sh/repo-intel)
+**Analysis** · [agent-analyzer](https://github.com/agent-sh/agent-analyzer)
 
 </details>
 
