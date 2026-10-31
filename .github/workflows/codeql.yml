@@ -13,13 +13,31 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+  languages:
+    runs-on: ubuntu-latest
+    permissions: {}
+    outputs:
+      matrix: ${{ steps.split.outputs.matrix }}
+    steps:
+      - id: split
+        env:
+          LANGUAGES: ${{ inputs.languages }}
+        run: |
+          matrix=$(jq -cn --arg l "$LANGUAGES" '$l | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))')
+          if [ "$matrix" = "[]" ]; then
+            echo "::error::languages input is empty"
+            exit 1
+          fi
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
   analyze:
+    needs: languages
     runs-on: ubuntu-latest
     permissions:
       security-events: write
     strategy:
       matrix:
-        language: ${{ fromJson(format('[{0}]', inputs.languages)) }}
+        language: ${{ fromJson(needs.languages.outputs.matrix) }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: github/codeql-action/init@v3
