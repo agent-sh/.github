@@ -55,6 +55,6 @@ cargo install parlar parlard && parlard fetch && parlard service
 
 ---
 
-Built and maintained by **[Avi Fenesh](https://github.com/avifenesh)** ([avifenesh.ai](https://avifenesh.ai) · [@avi_fenesh](https://x.com/avi_fenesh)), founder of **[Tiyuvta](https://tiyuvta.ai)** and **[Valkey GLIDE](https://github.com/valkey-io/valkey-glide)** maintainer.
+Built and maintained by **[Avi Fenesh](https://github.com/avifenesh)** ([avifenesh.ai](https://avifenesh.ai) · [@avi_fenesh](https://x.com/avi_fenesh)), **[Valkey GLIDE](https://github.com/valkey-io/valkey-glide)** maintainer.
 
 If you enjoy these tools and want to help cover the tokens, you can **[sponsor on GitHub](https://github.com/sponsors/avifenesh)**.
